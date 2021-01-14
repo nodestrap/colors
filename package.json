@@ -1,14 +1,25 @@
 {
-  "name": "@heymarco/colors",
+  "name": "@nodestrap/colors",
   "version": "2.0.1",
-  "description": "A set of common color definitions.",
+  "description": "A set of common color definition.",
+  "directories": {
+    "test": "test"
+  },
+  "dependencies": {
+    "@nodestrap/sass-class-template": "^2.0.2",
+    "@nodestrap/sass-selector": "^2.0.1",
+    "@nodestrap/sass-string": "^2.0.5"
+  },
+  "devDependencies": {
+    "tilde-sass": "^1.0.0"
+  },
   "scripts": {
     "test": "tilde-sass --file test/*.scss --outFile test/",
     "compile": "tilde-sass --file src/*.scss --outFile dist/ --outputStyle compressed"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/heyymarco/colors.git"
+    "url": "git+https://github.com/nodestrap/colors.git"
   },
   "keywords": [
     "color",
@@ -17,18 +28,10 @@
     "bootstrap",
     "theme"
   ],
-  "author": "HeyMarco",
+  "author": "nodestrap, heymarco",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/heyymarco/colors/issues"
+    "url": "https://github.com/nodestrap/colors/issues"
   },
-  "homepage": "https://github.com/heyymarco/colors#readme",
-  "dependencies": {
-    "@heymarco/sass-class-template": "^2.0.1",
-    "@heymarco/sass-selector": "^2.0.1",
-    "@heymarco/sass-string": "^2.0.4"
-  },
-  "devDependencies": {
-    "tilde-sass": "^1.0.0"
-  }
+  "homepage": "https://github.com/nodestrap/colors#readme"
 }

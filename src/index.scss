@@ -7,11 +7,11 @@
 
 
 
-@use "~@heymarco/sass-class-template/src/index" as *;
-@use "~@heymarco/sass-selector/src/index"       as selector;
-@use "~@heymarco/sass-string/src/index"         as string;
-@use "bootstrap-colors"                         as *;
-@use "sass:map"                                 as map;
+@use "~@nodestrap/sass-class-template/src/index" as *;
+@use "~@nodestrap/sass-selector/src/index"       as selector;
+@use "~@nodestrap/sass-string/src/index"         as string;
+@use "bootstrap-colors"                          as *;
+@use "sass:map"                                  as map;
 
 
 
