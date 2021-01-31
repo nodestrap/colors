@@ -15,42 +15,41 @@
 
 
 
-$alias              : "%color"                              !default;
 $class              : ""                                    !default;
 $var-root           : ":root"                               !default;
 $var-prefix         : "col"                                 !default;
 $var-prefix-base    : ""                                    !default;
-$cssvar: make-cssvar($var-prefix, $var-prefix-base);
-$_cssvar: $cssvar;
+$var: make-var($var-prefix, $var-prefix-base);
+$_var: $var;
 
-$contrast-dark      : var(#{$cssvar}black)                  !default;
-$contrast-light     : var(#{$cssvar}white)                  !default;
-$contrast-threshold : calc(((1 + 0.05) / var(#{$cssvar}contrast-ratio-min)) - 0.05) !default;
+$contrast-dark      : var(#{$var}black)                     !default;
+$contrast-light     : var(#{$var}white)                     !default;
+$contrast-threshold : calc(((1 + 0.05) / var(#{$var}contrast-ratio-min)) - 0.05) !default;
 
 
 
-@include declare-cssvar($var-root) {
-    #{$cssvar}contrast-dark         : $contrast-dark;
-    #{$cssvar}contrast-light        : $contrast-light;
-    #{$cssvar}contrast-ratio-min    : $contrast-ratio-min;
-    #{$cssvar}contrast-threshold    : $contrast-threshold;
+@include declare-vars($var-root) {
+    #{$var}contrast-dark        : $contrast-dark;
+    #{$var}contrast-light       : $contrast-light;
+    #{$var}contrast-ratio-min   : $contrast-ratio-min;
+    #{$var}contrast-threshold   : $contrast-threshold;
 
 
 
     @each $name, $value in $colors {
-        #{$cssvar}#{$name} : #{$value};
+        #{$var}#{$name} : #{$value};
     }
 
     @each $name, $value in $colors-transp {
-        #{$cssvar}#{$name} : #{$value};
+        #{$var}#{$name} : #{$value};
     }
 
     @each $name, $value in $themes {
-        #{$cssvar}#{$name} : #{$value};
+        #{$var}#{$name} : #{$value};
     }
 
     @each $name, $value in $themes-transp {
-        #{$cssvar}#{$name} : #{$value};
+        #{$var}#{$name} : #{$value};
     }
 }
 
@@ -75,7 +74,7 @@ $contrast-threshold : calc(((1 + 0.05) / var(#{$cssvar}contrast-ratio-min)) - 0.
 }
 
 
-@mixin cssvar-rgb($cssvar: $cssvar, $name: "color", $suffix: "") {
+@mixin var-rgb($var: $var, $name: "color", $suffix: "") {
     // https://css-tricks.com/converting-color-spaces-in-javascript/
 
     // c = (1 - Math.abs(2 * l - 1)) * s
@@ -163,19 +162,19 @@ $contrast-threshold : calc(((1 + 0.05) / var(#{$cssvar}contrast-ratio-min)) - 0.
     
 
     @if (string.not-empty($suffix)) { $suffix: "-" + $suffix; }
-    $cssvar-color: #{$cssvar}#{$name}#{$suffix};
+    $var-color: #{$var}#{$name}#{$suffix};
 
     // to avoid sass altering unnecessary whitespaces, we process the formula in formatted string first, then unwrap (unquote) the string:
 
-    #{$cssvar-color}-c: string.unquote("calc((1 - ((2*var(#{$cssvar-color}-l) - 1)*clamp(-1,(2*var(#{$cssvar-color}-l) - 1)*999,1)))*var(#{$cssvar-color}-s))");
-    #{$cssvar-color}-x: string.unquote("calc(var(#{$cssvar-color}-c)*(1 - ((((var(#{$cssvar-color}-h) - (clamp(0,((var(#{$cssvar-color}-h) - 120)*999) + 1,1) + clamp(0,((var(#{$cssvar-color}-h) - 240)*999) + 1,1) + clamp(0,((var(#{$cssvar-color}-h) - 360)*999) + 1,1))*120)/60) - 1)*clamp(-1,(((var(#{$cssvar-color}-h) - (clamp(0,((var(#{$cssvar-color}-h) - 120)*999) + 1,1) + clamp(0,((var(#{$cssvar-color}-h) - 240)*999) + 1,1) + clamp(0,((var(#{$cssvar-color}-h) - 360)*999) + 1,1))*120)/60) - 1)*999,1))))");
+    #{$var-color}-c: string.unquote("calc((1 - ((2*var(#{$var-color}-l) - 1)*clamp(-1,(2*var(#{$var-color}-l) - 1)*999,1)))*var(#{$var-color}-s))");
+    #{$var-color}-x: string.unquote("calc(var(#{$var-color}-c)*(1 - ((((var(#{$var-color}-h) - (clamp(0,((var(#{$var-color}-h) - 120)*999) + 1,1) + clamp(0,((var(#{$var-color}-h) - 240)*999) + 1,1) + clamp(0,((var(#{$var-color}-h) - 360)*999) + 1,1))*120)/60) - 1)*clamp(-1,(((var(#{$var-color}-h) - (clamp(0,((var(#{$var-color}-h) - 120)*999) + 1,1) + clamp(0,((var(#{$var-color}-h) - 240)*999) + 1,1) + clamp(0,((var(#{$var-color}-h) - 360)*999) + 1,1))*120)/60) - 1)*999,1))))");
 
-    #{$cssvar-color}-r: string.unquote("calc(((var(#{$cssvar-color}-l) - var(#{$cssvar-color}-c)/2) + (var(#{$cssvar-color}-c)*clamp(0,clamp(0,((var(#{$cssvar-color}-h) - 300)*999) + 1,1)*clamp(0,(360 - var(#{$cssvar-color}-h))*999,1) + clamp(0,((var(#{$cssvar-color}-h) - 0)*999) + 1,1)*clamp(0,(60 - var(#{$cssvar-color}-h))*999,1),1)) + (var(#{$cssvar-color}-x)*clamp(0,clamp(0,((var(#{$cssvar-color}-h) - 60)*999) + 1,1)*clamp(0,(120 - var(#{$cssvar-color}-h))*999,1) + clamp(0,((var(#{$cssvar-color}-h) - 240)*999) + 1,1)*clamp(0,(300 - var(#{$cssvar-color}-h))*999,1),1)))*255)");
-    #{$cssvar-color}-g: string.unquote("calc(((var(#{$cssvar-color}-l) - var(#{$cssvar-color}-c)/2) + (var(#{$cssvar-color}-c)*clamp(0,clamp(0,((var(#{$cssvar-color}-h) - 60)*999) + 1,1)*clamp(0,(120 - var(#{$cssvar-color}-h))*999,1) + clamp(0,((var(#{$cssvar-color}-h) - 120)*999) + 1,1)*clamp(0,(180 - var(#{$cssvar-color}-h))*999,1),1)) + (var(#{$cssvar-color}-x)*clamp(0,clamp(0,((var(#{$cssvar-color}-h) - 0)*999) + 1,1)*clamp(0,(60 - var(#{$cssvar-color}-h))*999,1) + clamp(0,((var(#{$cssvar-color}-h) - 180)*999) + 1,1)*clamp(0,(240 - var(#{$cssvar-color}-h))*999,1),1)))*255)");
-    #{$cssvar-color}-b: string.unquote("calc(((var(#{$cssvar-color}-l) - var(#{$cssvar-color}-c)/2) + (var(#{$cssvar-color}-c)*clamp(0,clamp(0,((var(#{$cssvar-color}-h) - 180)*999) + 1,1)*clamp(0,(240 - var(#{$cssvar-color}-h))*999,1) + clamp(0,((var(#{$cssvar-color}-h) - 240)*999) + 1,1)*clamp(0,(300 - var(#{$cssvar-color}-h))*999,1),1)) + (var(#{$cssvar-color}-x)*clamp(0,clamp(0,((var(#{$cssvar-color}-h) - 300)*999) + 1,1)*clamp(0,(360 - var(#{$cssvar-color}-h))*999,1) + clamp(0,((var(#{$cssvar-color}-h) - 120)*999) + 1,1)*clamp(0,(180 - var(#{$cssvar-color}-h))*999,1),1)))*255)");
+    #{$var-color}-r: string.unquote("calc(((var(#{$var-color}-l) - var(#{$var-color}-c)/2) + (var(#{$var-color}-c)*clamp(0,clamp(0,((var(#{$var-color}-h) - 300)*999) + 1,1)*clamp(0,(360 - var(#{$var-color}-h))*999,1) + clamp(0,((var(#{$var-color}-h) - 0)*999) + 1,1)*clamp(0,(60 - var(#{$var-color}-h))*999,1),1)) + (var(#{$var-color}-x)*clamp(0,clamp(0,((var(#{$var-color}-h) - 60)*999) + 1,1)*clamp(0,(120 - var(#{$var-color}-h))*999,1) + clamp(0,((var(#{$var-color}-h) - 240)*999) + 1,1)*clamp(0,(300 - var(#{$var-color}-h))*999,1),1)))*255)");
+    #{$var-color}-g: string.unquote("calc(((var(#{$var-color}-l) - var(#{$var-color}-c)/2) + (var(#{$var-color}-c)*clamp(0,clamp(0,((var(#{$var-color}-h) - 60)*999) + 1,1)*clamp(0,(120 - var(#{$var-color}-h))*999,1) + clamp(0,((var(#{$var-color}-h) - 120)*999) + 1,1)*clamp(0,(180 - var(#{$var-color}-h))*999,1),1)) + (var(#{$var-color}-x)*clamp(0,clamp(0,((var(#{$var-color}-h) - 0)*999) + 1,1)*clamp(0,(60 - var(#{$var-color}-h))*999,1) + clamp(0,((var(#{$var-color}-h) - 180)*999) + 1,1)*clamp(0,(240 - var(#{$var-color}-h))*999,1),1)))*255)");
+    #{$var-color}-b: string.unquote("calc(((var(#{$var-color}-l) - var(#{$var-color}-c)/2) + (var(#{$var-color}-c)*clamp(0,clamp(0,((var(#{$var-color}-h) - 180)*999) + 1,1)*clamp(0,(240 - var(#{$var-color}-h))*999,1) + clamp(0,((var(#{$var-color}-h) - 240)*999) + 1,1)*clamp(0,(300 - var(#{$var-color}-h))*999,1),1)) + (var(#{$var-color}-x)*clamp(0,clamp(0,((var(#{$var-color}-h) - 300)*999) + 1,1)*clamp(0,(360 - var(#{$var-color}-h))*999,1) + clamp(0,((var(#{$var-color}-h) - 120)*999) + 1,1)*clamp(0,(180 - var(#{$var-color}-h))*999,1),1)))*255)");
 
 }
-@mixin cssvar-luminance($cssvar: $cssvar, $name: "color", $suffix: "") {
+@mixin var-luminance($var: $var, $name: "color", $suffix: "") {
     // u = (
     //         (                         clamp(0,  26 - n, 1) *  n         / 2756  )
     //     + (  clamp(0, n -  27, 1) * clamp(0,  51 - n, 1) * (n - 15.3) / 1106  )
@@ -202,11 +201,11 @@ $contrast-threshold : calc(((1 + 0.05) / var(#{$cssvar}contrast-ratio-min)) - 0.
     
 
     @if (string.not-empty($suffix)) { $suffix: "-" + $suffix; }
-    $cssvar-color: #{$cssvar}#{$name}#{$suffix};
+    $var-color: #{$var}#{$name}#{$suffix};
     
     // to avoid sass altering unnecessary whitespaces, we process the formula in formatted string first, then unwrap (unquote) the string:
 
-    #{$cssvar-color}-u: string.unquote("calc(((0.2126*((clamp(0,26 - var(#{$cssvar-color}-r),1)*var(#{$cssvar-color}-r)/2756) + (clamp(0,var(#{$cssvar-color}-r) - 27,1)*clamp(0,51 - var(#{$cssvar-color}-r),1)*(var(#{$cssvar-color}-r) - 15.3)/1106) + (clamp(0,var(#{$cssvar-color}-r) - 52,1)*clamp(0,77 - var(#{$cssvar-color}-r),1)*(var(#{$cssvar-color}-r) - 30.5)/634) + (clamp(0,var(#{$cssvar-color}-r) - 78,1)*clamp(0,102 - var(#{$cssvar-color}-r),1)*(var(#{$cssvar-color}-r) - 45.6)/427) + (clamp(0,var(#{$cssvar-color}-r) - 103,1)*clamp(0,128 - var(#{$cssvar-color}-r),1)*(var(#{$cssvar-color}-r) - 60.5)/314) + (clamp(0,var(#{$cssvar-color}-r) - 129,1)*clamp(0,153 - var(#{$cssvar-color}-r),1)*(var(#{$cssvar-color}-r) - 75.5)/244) + (clamp(0,var(#{$cssvar-color}-r) - 154,1)*clamp(0,179 - var(#{$cssvar-color}-r),1)*(var(#{$cssvar-color}-r) - 90.4)/197) + (clamp(0,var(#{$cssvar-color}-r) - 180,1)*clamp(0,204 - var(#{$cssvar-color}-r),1)*(var(#{$cssvar-color}-r) - 105)/163) + (clamp(0,var(#{$cssvar-color}-r) - 205,1)*clamp(0,230 - var(#{$cssvar-color}-r),1)*(var(#{$cssvar-color}-r) - 120)/139) + (clamp(0,var(#{$cssvar-color}-r) - 231,1)*(var(#{$cssvar-color}-r) - 135)/120))) + (0.7152*((clamp(0,26 - var(#{$cssvar-color}-g),1)*var(#{$cssvar-color}-g)/2756) + (clamp(0,var(#{$cssvar-color}-g) - 27,1)*clamp(0,51 - var(#{$cssvar-color}-g),1)*(var(#{$cssvar-color}-g) - 15.3)/1106) + (clamp(0,var(#{$cssvar-color}-g) - 52,1)*clamp(0,77 - var(#{$cssvar-color}-g),1)*(var(#{$cssvar-color}-g) - 30.5)/634) + (clamp(0,var(#{$cssvar-color}-g) - 78,1)*clamp(0,102 - var(#{$cssvar-color}-g),1)*(var(#{$cssvar-color}-g) - 45.6)/427) + (clamp(0,var(#{$cssvar-color}-g) - 103,1)*clamp(0,128 - var(#{$cssvar-color}-g),1)*(var(#{$cssvar-color}-g) - 60.5)/314) + (clamp(0,var(#{$cssvar-color}-g) - 129,1)*clamp(0,153 - var(#{$cssvar-color}-g),1)*(var(#{$cssvar-color}-g) - 75.5)/244) + (clamp(0,var(#{$cssvar-color}-g) - 154,1)*clamp(0,179 - var(#{$cssvar-color}-g),1)*(var(#{$cssvar-color}-g) - 90.4)/197) + (clamp(0,var(#{$cssvar-color}-g) - 180,1)*clamp(0,204 - var(#{$cssvar-color}-g),1)*(var(#{$cssvar-color}-g) - 105)/163) + (clamp(0,var(#{$cssvar-color}-g) - 205,1)*clamp(0,230 - var(#{$cssvar-color}-g),1)*(var(#{$cssvar-color}-g) - 120)/139) + (clamp(0,var(#{$cssvar-color}-g) - 231,1)*(var(#{$cssvar-color}-g) - 135)/120))) + (0.0722*((clamp(0,26 - var(#{$cssvar-color}-b),1)*var(#{$cssvar-color}-b)/2756) + (clamp(0,var(#{$cssvar-color}-b) - 27,1)*clamp(0,51 - var(#{$cssvar-color}-b),1)*(var(#{$cssvar-color}-b) - 15.3)/1106) + (clamp(0,var(#{$cssvar-color}-b) - 52,1)*clamp(0,77 - var(#{$cssvar-color}-b),1)*(var(#{$cssvar-color}-b) - 30.5)/634) + (clamp(0,var(#{$cssvar-color}-b) - 78,1)*clamp(0,102 - var(#{$cssvar-color}-b),1)*(var(#{$cssvar-color}-b) - 45.6)/427) + (clamp(0,var(#{$cssvar-color}-b) - 103,1)*clamp(0,128 - var(#{$cssvar-color}-b),1)*(var(#{$cssvar-color}-b) - 60.5)/314) + (clamp(0,var(#{$cssvar-color}-b) - 129,1)*clamp(0,153 - var(#{$cssvar-color}-b),1)*(var(#{$cssvar-color}-b) - 75.5)/244) + (clamp(0,var(#{$cssvar-color}-b) - 154,1)*clamp(0,179 - var(#{$cssvar-color}-b),1)*(var(#{$cssvar-color}-b) - 90.4)/197) + (clamp(0,var(#{$cssvar-color}-b) - 180,1)*clamp(0,204 - var(#{$cssvar-color}-b),1)*(var(#{$cssvar-color}-b) - 105)/163) + (clamp(0,var(#{$cssvar-color}-b) - 205,1)*clamp(0,230 - var(#{$cssvar-color}-b),1)*(var(#{$cssvar-color}-b) - 120)/139) + (clamp(0,var(#{$cssvar-color}-b) - 231,1)*(var(#{$cssvar-color}-b) - 135)/120)))))");
+    #{$var-color}-u: string.unquote("calc(((0.2126*((clamp(0,26 - var(#{$var-color}-r),1)*var(#{$var-color}-r)/2756) + (clamp(0,var(#{$var-color}-r) - 27,1)*clamp(0,51 - var(#{$var-color}-r),1)*(var(#{$var-color}-r) - 15.3)/1106) + (clamp(0,var(#{$var-color}-r) - 52,1)*clamp(0,77 - var(#{$var-color}-r),1)*(var(#{$var-color}-r) - 30.5)/634) + (clamp(0,var(#{$var-color}-r) - 78,1)*clamp(0,102 - var(#{$var-color}-r),1)*(var(#{$var-color}-r) - 45.6)/427) + (clamp(0,var(#{$var-color}-r) - 103,1)*clamp(0,128 - var(#{$var-color}-r),1)*(var(#{$var-color}-r) - 60.5)/314) + (clamp(0,var(#{$var-color}-r) - 129,1)*clamp(0,153 - var(#{$var-color}-r),1)*(var(#{$var-color}-r) - 75.5)/244) + (clamp(0,var(#{$var-color}-r) - 154,1)*clamp(0,179 - var(#{$var-color}-r),1)*(var(#{$var-color}-r) - 90.4)/197) + (clamp(0,var(#{$var-color}-r) - 180,1)*clamp(0,204 - var(#{$var-color}-r),1)*(var(#{$var-color}-r) - 105)/163) + (clamp(0,var(#{$var-color}-r) - 205,1)*clamp(0,230 - var(#{$var-color}-r),1)*(var(#{$var-color}-r) - 120)/139) + (clamp(0,var(#{$var-color}-r) - 231,1)*(var(#{$var-color}-r) - 135)/120))) + (0.7152*((clamp(0,26 - var(#{$var-color}-g),1)*var(#{$var-color}-g)/2756) + (clamp(0,var(#{$var-color}-g) - 27,1)*clamp(0,51 - var(#{$var-color}-g),1)*(var(#{$var-color}-g) - 15.3)/1106) + (clamp(0,var(#{$var-color}-g) - 52,1)*clamp(0,77 - var(#{$var-color}-g),1)*(var(#{$var-color}-g) - 30.5)/634) + (clamp(0,var(#{$var-color}-g) - 78,1)*clamp(0,102 - var(#{$var-color}-g),1)*(var(#{$var-color}-g) - 45.6)/427) + (clamp(0,var(#{$var-color}-g) - 103,1)*clamp(0,128 - var(#{$var-color}-g),1)*(var(#{$var-color}-g) - 60.5)/314) + (clamp(0,var(#{$var-color}-g) - 129,1)*clamp(0,153 - var(#{$var-color}-g),1)*(var(#{$var-color}-g) - 75.5)/244) + (clamp(0,var(#{$var-color}-g) - 154,1)*clamp(0,179 - var(#{$var-color}-g),1)*(var(#{$var-color}-g) - 90.4)/197) + (clamp(0,var(#{$var-color}-g) - 180,1)*clamp(0,204 - var(#{$var-color}-g),1)*(var(#{$var-color}-g) - 105)/163) + (clamp(0,var(#{$var-color}-g) - 205,1)*clamp(0,230 - var(#{$var-color}-g),1)*(var(#{$var-color}-g) - 120)/139) + (clamp(0,var(#{$var-color}-g) - 231,1)*(var(#{$var-color}-g) - 135)/120))) + (0.0722*((clamp(0,26 - var(#{$var-color}-b),1)*var(#{$var-color}-b)/2756) + (clamp(0,var(#{$var-color}-b) - 27,1)*clamp(0,51 - var(#{$var-color}-b),1)*(var(#{$var-color}-b) - 15.3)/1106) + (clamp(0,var(#{$var-color}-b) - 52,1)*clamp(0,77 - var(#{$var-color}-b),1)*(var(#{$var-color}-b) - 30.5)/634) + (clamp(0,var(#{$var-color}-b) - 78,1)*clamp(0,102 - var(#{$var-color}-b),1)*(var(#{$var-color}-b) - 45.6)/427) + (clamp(0,var(#{$var-color}-b) - 103,1)*clamp(0,128 - var(#{$var-color}-b),1)*(var(#{$var-color}-b) - 60.5)/314) + (clamp(0,var(#{$var-color}-b) - 129,1)*clamp(0,153 - var(#{$var-color}-b),1)*(var(#{$var-color}-b) - 75.5)/244) + (clamp(0,var(#{$var-color}-b) - 154,1)*clamp(0,179 - var(#{$var-color}-b),1)*(var(#{$var-color}-b) - 90.4)/197) + (clamp(0,var(#{$var-color}-b) - 180,1)*clamp(0,204 - var(#{$var-color}-b),1)*(var(#{$var-color}-b) - 105)/163) + (clamp(0,var(#{$var-color}-b) - 205,1)*clamp(0,230 - var(#{$var-color}-b),1)*(var(#{$var-color}-b) - 120)/139) + (clamp(0,var(#{$var-color}-b) - 231,1)*(var(#{$var-color}-b) - 135)/120)))))");
 
 }
 /* end: mixins */
@@ -214,180 +213,155 @@ $contrast-threshold : calc(((1 + 0.05) / var(#{$cssvar}contrast-ratio-min)) - 0.
 
 
 /* begin: functions */
-@function cssvar-hsl($cssvar: $cssvar, $name: "color", $suffix: "") {
+@function var-hsl($var: $var, $name: "color", $suffix: "") {
     
     // @return hsl(
     //     calc(
-    //         var(#{$cssvar-color}-h)
+    //         var(#{$var-color}-h)
     //         * 1deg
     //     ),
     //     calc(
-    //         var(#{$cssvar-color}-s)
+    //         var(#{$var-color}-s)
     //         * 100%
     //     ),
     //     calc(
-    //         var(#{$cssvar-color}-l)
+    //         var(#{$var-color}-l)
     //         * 100%
     //     )
     // );
 
     @if (string.not-empty($suffix)) { $suffix: "-" + $suffix; }
-    $cssvar-color: #{$cssvar}#{$name}#{$suffix};
+    $var-color: #{$var}#{$name}#{$suffix};
 
     // to avoid sass altering unnecessary whitespaces, we process the formula in formatted string first, then unwrap (unquote) the string:
 
-    @return string.unquote("hsl(calc(var(#{$cssvar-color}-h)*1deg),calc(var(#{$cssvar-color}-s)*100%),calc(var(#{$cssvar-color}-l)*100%))");
+    @return string.unquote("hsl(calc(var(#{$var-color}-h)*1deg),calc(var(#{$var-color}-s)*100%),calc(var(#{$var-color}-l)*100%))");
 }
-@function cssvar-hsla($cssvar: $cssvar, $name: "color", $suffix: "") {
+@function var-hsla($var: $var, $name: "color", $suffix: "") {
 
     // @return hsla(
     //     calc(
-    //         var(#{$cssvar-color}-h)
+    //         var(#{$var-color}-h)
     //         * 1deg
     //     ),
     //     calc(
-    //         var(#{$cssvar-color}-s)
+    //         var(#{$var-color}-s)
     //         * 100%
     //     ),
     //     calc(
-    //         var(#{$cssvar-color}-l)
+    //         var(#{$var-color}-l)
     //         * 100%
     //     ),
     //     calc(
-    //         var(#{$cssvar-color}-a)
+    //         var(#{$var-color}-a)
     //         * 100%
     //     )
     // );
 
     @if (string.not-empty($suffix)) { $suffix: "-" + $suffix; }
-    $cssvar-color: #{$cssvar}#{$name}#{$suffix};
+    $var-color: #{$var}#{$name}#{$suffix};
 
     // to avoid sass altering unnecessary whitespaces, we process the formula in formatted string first, then unwrap (unquote) the string:
 
-    @return string.unquote("hsla(calc(var(#{$cssvar-color}-h)*1deg),calc(var(#{$cssvar-color}-s)*100%),calc(var(#{$cssvar-color}-l)*100%),calc(var(#{$cssvar-color}-a)*100%))");
+    @return string.unquote("hsla(calc(var(#{$var-color}-h)*1deg),calc(var(#{$var-color}-s)*100%),calc(var(#{$var-color}-l)*100%),calc(var(#{$var-color}-a)*100%))");
 }
 
-@function cssvar-contrast-l($cssvar: $cssvar, $name: "color", $suffix: "") {
+@function var-contrast-l($var: $var, $name: "color", $suffix: "") {
 
     // @return clamp(
     //     0,
-    //     (var(#{$cssvar-color}-u) - var(#{$_cssvar}contrast-threshold)) * -9999
+    //     (var(#{$var-color}-u) - var(#{$_var}contrast-threshold)) * -9999
     //     ,1
     // );
 
     @if (string.not-empty($suffix)) { $suffix: "-" + $suffix; }
-    $cssvar-color: #{$cssvar}#{$name}#{$suffix};
+    $var-color: #{$var}#{$name}#{$suffix};
 
     // to avoid sass altering unnecessary whitespaces, we process the formula in formatted string first, then unwrap (unquote) the string:
 
-    @return string.unquote("clamp(0,(var(#{$cssvar-color}-u) - var(#{$_cssvar}contrast-threshold))*-9999,1)");
+    @return string.unquote("clamp(0,(var(#{$var-color}-u) - var(#{$_var}contrast-threshold))*-9999,1)");
 }
-@function cssvar-contrast-hsl($cssvar: $cssvar, $name: "color", $suffix: "") {
+@function var-contrast-hsl($var: $var, $name: "color", $suffix: "") {
 
     // @return hsl(
     //     calc(
-    //         var(#{$cssvar-color}-h)
+    //         var(#{$var-color}-h)
     //         * 1deg
     //     ),
     //     calc(
-    //         var(#{$cssvar-color}-s)
+    //         var(#{$var-color}-s)
     //         * 100%
     //     ),
     //     calc(
-    //         #{cssvar-contrast-l($cssvar: $cssvar, $name: $name, $suffix: $suffix)}
+    //         #{var-contrast-l($var: $var, $name: $name, $suffix: $suffix)}
     //         * 100%
     //     )
     // );
 
     @if (string.not-empty($suffix)) { $suffix: "-" + $suffix; }
-    $cssvar-color: #{$cssvar}#{$name}#{$suffix};
+    $var-color: #{$var}#{$name}#{$suffix};
 
     // to avoid sass altering unnecessary whitespaces, we process the formula in formatted string first, then unwrap (unquote) the string:
 
-    @return string.unquote("hsl(calc(var(#{$cssvar-color}-h)*1deg),calc(var(#{$cssvar-color}-s)*100%),calc(#{cssvar-contrast-l($cssvar: $cssvar, $name: $name, $suffix: $suffix)}*100%))");
+    @return string.unquote("hsl(calc(var(#{$var-color}-h)*1deg),calc(var(#{$var-color}-s)*100%),calc(#{var-contrast-l($var: $var, $name: $name, $suffix: $suffix)}*100%))");
 }
-@function cssvar-contrast-hsla($cssvar: $cssvar, $name: "color", $suffix: "") {
+@function var-contrast-hsla($var: $var, $name: "color", $suffix: "") {
 
     // @return hsla(
     //     calc(
-    //         var(#{$cssvar-color}-h)
+    //         var(#{$var-color}-h)
     //         * 1deg
     //     ),
     //     calc(
-    //         var(#{$cssvar-color}-s)
+    //         var(#{$var-color}-s)
     //         * 100%
     //     ),
     //     calc(
-    //         #{cssvar-contrast-l($cssvar: $cssvar, $name: $name, $suffix: $suffix)}
+    //         #{var-contrast-l($var: $var, $name: $name, $suffix: $suffix)}
     //         * 100%
     //     ),
     //     calc(
-    //         var(#{$cssvar-color}-a)
+    //         var(#{$var-color}-a)
     //         * 100%
     //     )
     // );
 
     @if (string.not-empty($suffix)) { $suffix: "-" + $suffix; }
-    $cssvar-color: #{$cssvar}#{$name}#{$suffix};
+    $var-color: #{$var}#{$name}#{$suffix};
 
     // to avoid sass altering unnecessary whitespaces, we process the formula in formatted string first, then unwrap (unquote) the string:
 
-    @return string.unquote("hsla(calc(var(#{$cssvar-color}-h)*1deg),calc(var(#{$cssvar-color}-s)*100%),calc(#{cssvar-contrast-l($cssvar: $cssvar, $name: $name, $suffix: $suffix)}*100%),calc(var(#{$cssvar-color}-a)*100%))");
+    @return string.unquote("hsla(calc(var(#{$var-color}-h)*1deg),calc(var(#{$var-color}-s)*100%),calc(#{var-contrast-l($var: $var, $name: $name, $suffix: $suffix)}*100%),calc(var(#{$var-color}-a)*100%))");
 }
 /* end: functions */
 
 
 
 /* begin: specialized style */
-@mixin _bg-blur-fross-light($include) {
+@mixin backg-blur-fross-light {
     backdrop-filter: blur(1px);
 }
-@mixin bg-blur-fross-light {
-    @include _bg-blur-fross-light(true);
-}
-@include alias($alias) { @include selector.append("-bg-blur-fross-light") {
-    @include _bg-blur-fross-light(false);
-}}
 
 
-@mixin _bg-blur-fross-glass($include) {
+@mixin backg-blur-fross-glass {
     backdrop-filter: blur(5px);
 }
-@mixin bg-blur-fross-glass {
-    @include _bg-blur-fross-glass(true);
-}
-@include alias($alias) { @include selector.append("-bg-blur-fross-glass") {
-    @include _bg-blur-fross-glass(false);
-}}
 
 
-@mixin _bg-blur-fross-thick($include) {
+@mixin backg-blur-fross-thick {
     backdrop-filter: blur(5px) blur(5px) blur(5px) blur(5px);
 }
-@mixin bg-blur-fross-thick {
-    @include _bg-blur-fross-thick(true);
-}
-@include alias($alias) { @include selector.append("-bg-blur-fross-thick") {
-    @include _bg-blur-fross-thick(false);
-}}
 /* end: specialized style */
 
 
 
 /* begin: general style */
-@mixin _style($include) {
-    // @if ($include) { @include base.style; }
-    // @else          { @extend #{base.$alias} !optional; }
-}
 @mixin style {
-    @include _style(true);
-}
-@include alias($alias) {
-    @include _style(false);
+    // @include base.style;
 }
 /* end: general style */
 
 
 
 // utility class => no emit class
-// @include class($alias, $class, base.$class);
+// @include class($class, base.$class) { @include style; }

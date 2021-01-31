@@ -1,21 +1,31 @@
 {
   "name": "@nodestrap/colors",
-  "version": "2.0.1",
+  "version": "3.0.1",
   "description": "A set of common color definition.",
   "directories": {
     "test": "test"
   },
   "dependencies": {
-    "@nodestrap/sass-class-template": "^2.0.2",
-    "@nodestrap/sass-selector": "^2.0.1",
-    "@nodestrap/sass-string": "^2.0.5"
+    "@nodestrap/sass-class-template": "^3.0.2",
+    "@nodestrap/sass-selector": "^2.0.2",
+    "@nodestrap/sass-string": "^2.0.6"
   },
   "devDependencies": {
-    "tilde-sass": "^1.0.0"
+    "tilde-sass": "^1.0.1"
   },
   "scripts": {
-    "test": "tilde-sass --file test/*.scss --outFile test/",
-    "compile": "tilde-sass --file src/*.scss --outFile dist/ --outputStyle compressed"
+    "test": "tilde-sass --file test/*.scss --outFile test/ --mergeSelectors",
+    "test-watch": "tilde-sass --file test/*.scss --outFile test/ --mergeSelectors --watch",
+    "compile": "tilde-sass --file src/*.scss --outFile dist/ --mergeSelectors --outputStyle compressed",
+    "compile-watch": "tilde-sass --file src/*.scss --outFile dist/ --mergeSelectors --outputStyle compressed --watch"
+  },
+  "cssnano": {
+    "preset": [
+      "default",
+      {
+        "calc": false
+      }
+    ]
   },
   "repository": {
     "type": "git",
