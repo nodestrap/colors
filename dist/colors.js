@@ -111,7 +111,12 @@ export const [cssProps, cssDecls, cssVals, cssConfig] = createCssConfig(() => {
             const color = allColors[prop];
             if (color === undefined)
                 return undefined;
-            return stringColor(color);
+            let strColor = color.__strColor;
+            if (strColor)
+                return strColor;
+            strColor = stringColor(color);
+            color.__strColor = strColor;
+            return strColor;
         },
     });
 }, { prefix: 'col' });

@@ -1,6 +1,6 @@
 {
   "name": "@nodestrap/colors",
-  "version": "4.0.1",
+  "version": "4.0.2",
   "description": "A color management system for web components using css variables (css custom properties).",
   "type": "module",
   "main": "dist/colors.js",
@@ -29,10 +29,10 @@
   },
   "homepage": "https://github.com/nodestrap/colors#readme",
   "dependencies": {
-    "@cssfn/css-config": "^1.0.1",
+    "@cssfn/css-config": "^1.0.2",
     "@cssfn/css-types": "^1.0.2",
     "@cssfn/types": "^1.0.3",
     "@types/color": "^3.0.2",
-    "color": "^4.0.1"
+    "color": "^4.1.0"
   }
 }

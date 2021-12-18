@@ -150,7 +150,13 @@ export const [cssProps, cssDecls, cssVals, cssConfig] = createCssConfig(() => {
         get: (t, prop: string) => {
             const color = (allColors as Dictionary<Color>)[prop];
             if (color === undefined) return undefined;
-            return stringColor(color);
+            
+            let strColor = (color as any).__strColor as string|undefined;
+            if (strColor) return strColor;
+            
+            strColor = stringColor(color);
+            (color as any).__strColor = strColor;
+            return strColor;
         },
     });
 }, { prefix: 'col' });
