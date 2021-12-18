@@ -108,14 +108,17 @@ const allColors = {
 export const [cssProps, cssDecls, cssVals, cssConfig] = createCssConfig(() => {
     return new Proxy(allColors, {
         get: (t, prop) => {
-            const color = allColors[prop];
+            let color = allColors[prop];
             if (color === undefined)
                 return undefined;
             let strColor = color.__strColor;
             if (strColor)
                 return strColor;
             strColor = stringColor(color);
+            // @ts-ignore
+            color = new ColorEx(color);
             color.__strColor = strColor;
+            allColors[prop] = color;
             return strColor;
         },
     });
@@ -231,3 +234,7 @@ export const defineTheme = (name, color) => {
         cssVals[`${name}Bold`] = themeBold;
     } // if
 };
+function ColorEx(color) {
+    Object.assign(this, color);
+}
+ColorEx.prototype = Color.prototype;

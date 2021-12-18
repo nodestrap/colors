@@ -148,14 +148,17 @@ export const [cssProps, cssDecls, cssVals, cssConfig] = createCssConfig(() => {
     type ColorProxy = { [key in keyof ColorList]: ColorType };
     return new Proxy(allColors as unknown as ColorProxy, {
         get: (t, prop: string) => {
-            const color = (allColors as Dictionary<Color>)[prop];
+            let color = (allColors as Dictionary<Color>)[prop];
             if (color === undefined) return undefined;
             
             let strColor = (color as any).__strColor as string|undefined;
             if (strColor) return strColor;
             
             strColor = stringColor(color);
+            // @ts-ignore
+            color = new ColorEx(color);
             (color as any).__strColor = strColor;
+            (allColors as Dictionary<Color>)[prop] = color;
             return strColor;
         },
     });
@@ -312,3 +315,8 @@ export const defineTheme = (name: string, color: Optional<Color|string>) => {
         (cssVals as DictionaryOf<typeof cssVals>)[`${name}Bold`]       = themeBold;
     } // if
 };
+
+function ColorEx(this: Color, color: Color) {
+    Object.assign(this, color);
+}
+ColorEx.prototype = Color.prototype;
