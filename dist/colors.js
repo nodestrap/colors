@@ -8,7 +8,8 @@ const config = {
     mildLevel: 0.8,
     boldLevel: 0.8,
 };
-const textColor = (color) => (color.isLight() ? themes.dark : themes.light);
+const textColorValue = (color) => (color.isLight() ? themes.dark : themes.light);
+const textColor = (color) => (color.isLight() ? colors.dark : colors.light);
 const thinColor = (color) => color.alpha(config.thinLevel);
 const mildColor = (color) => color.mix(page1.backg, config.mildLevel);
 const boldColor = (color) => color.mix(page2.foreg, config.boldLevel);
@@ -43,7 +44,7 @@ const page1 = {
     backg: basics.white,
 };
 const page2 = {
-    foreg: textColor(page1.backg),
+    foreg: textColorValue(page1.backg),
 };
 const page3 = {
     backgThin: thinColor(page1.backg),
@@ -54,14 +55,14 @@ const page3 = {
     foregBold: boldColor(page2.foreg),
 };
 const themesText = {
-    primaryText: textColor(themes.primary),
-    secondaryText: textColor(themes.secondary),
-    successText: textColor(themes.success),
-    infoText: textColor(themes.info),
-    warningText: textColor(themes.warning),
-    dangerText: textColor(themes.danger),
-    lightText: textColor(themes.light),
-    darkText: textColor(themes.dark),
+    primaryText: textColorValue(themes.primary),
+    secondaryText: textColorValue(themes.secondary),
+    successText: textColorValue(themes.success),
+    infoText: textColorValue(themes.info),
+    warningText: textColorValue(themes.warning),
+    dangerText: textColorValue(themes.danger),
+    lightText: textColorValue(themes.light),
+    darkText: textColorValue(themes.dark),
 };
 const themesThin = {
     primaryThin: thinColor(themes.primary),
@@ -105,21 +106,33 @@ const allColors = {
     ...themesBold,
 };
 //#endregion define colors by group
+const stringColorCache = new WeakMap();
+const isRef = (value) => (typeof (value) === 'string') && value.startsWith('var(--');
 export const [cssProps, cssDecls, cssVals, cssConfig] = createCssConfig(() => {
     return new Proxy(allColors, {
-        get: (t, prop) => {
-            let color = allColors[prop];
+        get: (t, propName) => {
+            let color = allColors[propName];
             if (color === undefined)
                 return undefined;
-            let strColor = color.__strColor;
+            if (isRef(color))
+                return color; // do not convert the string if it's likely a css variable
+            let strColor = stringColorCache.get(color);
             if (strColor)
                 return strColor;
             strColor = stringColor(color);
-            // @ts-ignore
-            color = new ColorEx(color);
-            color.__strColor = strColor;
-            allColors[prop] = color;
+            stringColorCache.set(color, strColor);
             return strColor;
+        },
+        set: (t, propName, newValue) => {
+            if (typeof (newValue) === 'string') {
+                if (!isRef(newValue)) { // do not convert the string if it's likely a css variable
+                    newValue = Color(newValue);
+                } // if
+            } // if
+            if ((typeof (newValue) !== 'string') && !(newValue instanceof Color))
+                throw TypeError('The value must be a string or Color.');
+            allColors[propName] = newValue;
+            return true;
         },
     });
 }, { prefix: 'col' });
@@ -129,7 +142,7 @@ const colors = cssProps;
 export const configProxy = new Proxy(config, {
     set: (config, propName, newValue) => {
         if (!(propName in config))
-            return false; // the requested prop does not exist
+            return false; // the requested propName does not exist
         if ((typeof (newValue) !== 'number') || (newValue < 0) || (newValue > 1))
             return false; // invalid value
         // compare `oldValue` & `newValue`:
@@ -148,16 +161,16 @@ export const configProxy = new Proxy(config, {
 });
 export { configProxy as config };
 const createProxy = (colorGroup) => new Proxy(colorGroup, {
-    get: (cg, prop) => {
-        if (!(prop in colorGroup))
+    get: (cg, propName) => {
+        if (!(propName in colorGroup))
             return undefined; // not found
-        return colors[prop];
+        return colors[propName];
     },
-    set: (cg, prop, newValue) => {
+    set: (cg, propName, newValue) => {
         const colorValue = Color(newValue);
-        cssVals[prop] = colorValue;
-        if (prop in colorGroup) {
-            colorGroup[prop] = colorValue;
+        cssVals[propName] = colorValue;
+        if (propName in colorGroup) {
+            colorGroup[propName] = colorValue;
         } // if
         return true;
     },
@@ -166,36 +179,50 @@ const themesProxy = createProxy(themes);
 const themesTextProxy = createProxy(themesText);
 export { themesProxy as themes, themesTextProxy as themesText, };
 // utilities:
-const stringColor = (color) => (color.alpha() === 1) ? color.hex() : color.toString();
+const stringColor = (color) => ((color.alpha() === 1) ? color.hex() : color.toString()).toLowerCase();
 export const defineBackg = (color, autoDefineForeg = true) => {
+    if (!color)
+        throw Error('You cannot delete the background color.');
     if (typeof (color) === 'string')
         color = Color(color);
+    if (!(color instanceof Color))
+        throw TypeError('The value must be a string or Color.');
+    // define sub-colors:
     const backg = color;
     const backgThin = thinColor(color);
     const backgMild = mildColor(color);
     const backgBold = boldColor(color);
+    // update caches:
     page1.backg = backg;
     page3.backgThin = backgThin;
     page3.backgMild = backgMild;
     page3.backgBold = backgBold;
+    // update cssConfig:
     cssVals.backg = backg;
     cssVals.backgThin = backgThin;
     cssVals.backgMild = backgMild;
     cssVals.backgBold = backgBold;
     if (autoDefineForeg)
-        defineForeg(textColor(color));
+        defineForeg(textColorValue(color));
 };
 export const defineForeg = (color) => {
+    if (!color)
+        throw Error('You cannot delete the foreground color.');
     if (typeof (color) === 'string')
         color = Color(color);
+    if (!(color instanceof Color))
+        throw TypeError('The value must be a string or Color.');
+    // define sub-colors:
     const foreg = color;
     const foregThin = thinColor(color);
     const foregMild = mildColor(color);
     const foregBold = boldColor(color);
+    // update caches:
     page2.foreg = foreg;
     page3.foregThin = foregThin;
     page3.foregMild = foregMild;
     page3.foregBold = foregBold;
+    // update cssConfig:
     cssVals.foreg = foreg;
     cssVals.foregThin = foregThin;
     cssVals.foregMild = foregMild;
@@ -203,11 +230,13 @@ export const defineForeg = (color) => {
 };
 export const defineTheme = (name, color) => {
     if (!color) {
+        // delete caches:
         delete themes[name];
         delete themesText[`${name}Text`];
         delete themesThin[`${name}Thin`];
         delete themesMild[`${name}Mild`];
         delete themesBold[`${name}Bold`];
+        // delete cssConfig:
         cssVals[name] = undefined;
         cssVals[`${name}Text`] = undefined;
         cssVals[`${name}Thin`] = undefined;
@@ -217,16 +246,22 @@ export const defineTheme = (name, color) => {
     else {
         if (typeof (color) === 'string')
             color = Color(color);
+        if (!(color instanceof Color))
+            throw TypeError('The value must be a string or Color.');
+        // define sub-colors:
         const theme = color;
+        const themeTextValue = textColorValue(color);
         const themeText = textColor(color);
         const themeThin = thinColor(color);
         const themeMild = mildColor(color);
         const themeBold = boldColor(color);
+        // update caches:
         themes[name] = theme;
-        themesText[`${name}Text`] = themeText;
+        themesText[`${name}Text`] = themeTextValue;
         themesThin[`${name}Thin`] = themeThin;
         themesMild[`${name}Mild`] = themeMild;
         themesBold[`${name}Bold`] = themeBold;
+        // update cssConfig:
         cssVals[name] = theme;
         cssVals[`${name}Text`] = themeText;
         cssVals[`${name}Thin`] = themeThin;
@@ -234,7 +269,6 @@ export const defineTheme = (name, color) => {
         cssVals[`${name}Bold`] = themeBold;
     } // if
 };
-function ColorEx(color) {
-    Object.assign(this, color);
-}
-ColorEx.prototype = Color.prototype;
+// setup css variables:
+for (const themeName in themes)
+    defineTheme(themeName, themes[themeName]);
